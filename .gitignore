@@ -1,0 +1,18 @@
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# App data
+backend/app.db
+backend/uploads/
+
+# Env
+.env
+.env.local
