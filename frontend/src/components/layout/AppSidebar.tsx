@@ -50,8 +50,15 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
       <div className="flex items-center justify-start h-16 px-6 border-b border-sidebar-border">
         <motion.div
           className={cn("flex items-center w-full", collapsed ? "gap-0" : "gap-3")}
-          whileHover={{ scale: 1.06, x: 4 }}
-          whileTap={{ scale: 0.96 }}
+          variants={{
+            rest: { scale: 1, x: 0 },
+            hover: { scale: 1.06, x: 4 },
+            tap: { scale: 0.96 },
+          }}
+          initial="rest"
+          animate="rest"
+          whileHover="hover"
+          whileTap="tap"
           transition={{ type: "spring", stiffness: 420, damping: 26 }}
         >
           <motion.img
@@ -78,7 +85,20 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 )}
               >
                 <span className="text-sidebar-accent-foreground/90">SPEND</span>
-                <span className="text-sidebar-primary">LY</span>
+                <motion.span
+                  className="inline-block text-sidebar-primary"
+                  variants={{
+                    rest: { x: 0, y: 0, rotate: 0 },
+                    hover: {
+                      x: 6,
+                      y: 4,
+                      rotate: 8,
+                      transition: { type: "spring", stiffness: 320, damping: 26, mass: 0.9 },
+                    },
+                  }}
+                >
+                  LY
+                </motion.span>
               </motion.span>
             )}
           </AnimatePresence>
