@@ -1,116 +1,44 @@
-import React from 'react'
-import { Route, Routes, Navigate } from 'react-router-dom'
-import ProtectedRoute from './components/ProtectedRoute'
-import Layout from './components/Layout'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import Receipts from './pages/Receipts'
-import Placeholder from './pages/Placeholder'
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppLayout } from "@/components/layout/AppLayout";
+import Dashboard from "./pages/Dashboard";
+import Invoices from "./pages/Invoices";
+import Expenses from "./pages/Expenses";
+import Tax from "./pages/Tax";
+import NotFound from "./pages/NotFound";
 
-const App: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Navigate to="/dashboard" replace />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Dashboard />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/receipts"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Receipts />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/inquiries"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Placeholder
-                title="Inquiries"
-                description="This module will handle client inquiries and job tracking."
-              />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/invoices"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Placeholder
-                title="Invoices"
-                description="Invoices page will allow users to create VAT and non-VAT invoices linked to inquiries."
-              />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/payments"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Placeholder
-                title="Payments"
-                description="Payments page will track incoming and outgoing payments across accounts."
-              />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/tax"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Placeholder
-                title="Tax Summary"
-                description="Tax summary will show VAT returns and income tax estimates."
-              />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/insights"
-        element={
-          <ProtectedRoute>
-            <Layout>
-              <Placeholder
-                title="Insights"
-                description="Insights will provide trends and basic analytics of business performance."
-              />
-            </Layout>
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
-}
+const queryClient = new QueryClient();
 
-export default App
+// Wrapper component for pages with layout
+const PageWithLayout = ({ children }: { children: React.ReactNode }) => (
+  <AppLayout>{children}</AppLayout>
+);
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          <Route path="/quotes" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          <Route path="/invoices" element={<PageWithLayout><Invoices /></PageWithLayout>} />
+          <Route path="/payments" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          <Route path="/expenses" element={<PageWithLayout><Expenses /></PageWithLayout>} />
+          <Route path="/transactions" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          <Route path="/tax" element={<PageWithLayout><Tax /></PageWithLayout>} />
+          <Route path="/reports" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          <Route path="/settings" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
