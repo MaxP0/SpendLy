@@ -1,9 +1,3 @@
-# Spendly Demo
-
-Minimal mid-point demo for the "Spendly" FYP.
-
-Focus: simple auth, navigation, static dashboard, and a working receipt upload with OCR (mock fallback).
-
 ## Tech Stack
 - Frontend: React + TypeScript + Vite + TailwindCSS
 - Backend: FastAPI (Python)
