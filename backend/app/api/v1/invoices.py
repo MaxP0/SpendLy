@@ -18,7 +18,7 @@ async def create_invoice(
     try:
         service = InvoiceService(db)
         invoice = await service.create_invoice(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             customer_id=request.customer_id,
             subtotal=request.subtotal,
             vat_rate=request.vat_rate,
@@ -37,7 +37,7 @@ async def list_invoices(
 ):
     """List all invoices for the current user."""
     service = InvoiceService(db)
-    invoices = await service.list_user_invoices(current_user["user_id"])
+    invoices = await service.list_user_invoices(current_user.id)
     return invoices
 
 
@@ -51,7 +51,7 @@ async def get_invoice(
     try:
         service = InvoiceService(db)
         invoice = await service.get_invoice(invoice_id)
-        if invoice.user_id != current_user["user_id"]:
+        if invoice.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return invoice
     except ValueError as e:
@@ -69,7 +69,7 @@ async def update_invoice(
     try:
         service = InvoiceService(db)
         invoice = await service.get_invoice(invoice_id)
-        if invoice.user_id != current_user["user_id"]:
+        if invoice.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
         invoice = await service.update_invoice(

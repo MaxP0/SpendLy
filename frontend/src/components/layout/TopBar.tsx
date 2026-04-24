@@ -1,13 +1,36 @@
-import { Bell, Calendar, ChevronDown, Search, User } from "lucide-react";
+import { Bell, Calendar, ChevronDown, LogOut, Search, Settings, User } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface TopBarProps {
   sidebarCollapsed: boolean;
 }
 
 export function TopBar({ sidebarCollapsed }: TopBarProps) {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const displayName = user?.business_name ?? user?.email ?? "Account";
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <motion.header
       initial={false}
@@ -51,13 +74,36 @@ export function TopBar({ sidebarCollapsed }: TopBarProps) {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
           </Button>
           <div className="w-px h-6 bg-border mx-2" />
-          <button className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition-colors">
-            <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center">
-              <User className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="text-sm font-medium hidden lg:block">John Murphy</span>
-            <ChevronDown className="w-4 h-4 text-muted-foreground hidden lg:block" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-secondary transition-colors">
+                <div className="w-8 h-8 rounded-full bg-gradient-hero flex items-center justify-center">
+                  <User className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <span className="text-sm font-medium hidden lg:block">{displayName}</span>
+                <ChevronDown className="w-4 h-4 text-muted-foreground hidden lg:block" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">{displayName}</div>
+                  <div className="text-xs text-muted-foreground">{user?.role}</div>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/settings" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 text-destructive focus:text-destructive">
+                <LogOut className="h-4 w-4" />
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </motion.header>

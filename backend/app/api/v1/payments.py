@@ -19,7 +19,7 @@ async def create_payment(
         service = PaymentService(db)
         payment = await service.record_payment(
             invoice_id=request.invoice_id,
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             amount=request.amount,
             payment_date=request.payment_date,
             transaction_id=request.transaction_id,
@@ -36,7 +36,7 @@ async def list_payments(
 ):
     """List all payments for the current user."""
     service = PaymentService(db)
-    payments = await service.list_user_payments(current_user["user_id"])
+    payments = await service.list_user_payments(current_user.id)
     return payments
 
 
@@ -50,7 +50,7 @@ async def get_payment(
     try:
         service = PaymentService(db)
         payment = await service.get_payment(payment_id)
-        if payment.user_id != current_user["user_id"]:
+        if payment.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return payment
     except ValueError as e:

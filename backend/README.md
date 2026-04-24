@@ -147,9 +147,17 @@ Swagger UI docs: `http://localhost:8000/docs`
 - `GET /api/v1/health` - Service health
 
 ### Authentication
-- `POST /api/v1/auth/register` - Register user
-- `POST /api/v1/auth/login` - Login and get JWT token
-- `GET /api/v1/auth/me` - Get current user
+- `POST /api/v1/auth/register` - Register user and receive access/refresh tokens
+- `POST /api/v1/auth/login` - Login and receive access/refresh tokens
+- `POST /api/v1/auth/refresh` - Exchange a refresh token for a new access token
+- `POST /api/v1/auth/logout` - Revoke the current refresh token
+- `GET /api/v1/auth/me` - Get the authenticated user profile
+
+Password policy:
+- Minimum 8 characters
+- At least 1 letter and 1 digit
+
+JWT access tokens last 15 minutes and refresh tokens last 7 days. Refresh tokens are stored in the database so logout can revoke them.
 
 ### Inquiries (Projects)
 - `POST /api/v1/inquiries` - Create inquiry

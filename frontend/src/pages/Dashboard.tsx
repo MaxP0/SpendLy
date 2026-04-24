@@ -7,8 +7,11 @@ import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { TaxConfidenceIndicator } from "@/components/dashboard/TaxConfidenceIndicator";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { IncomeExpenseChart } from "@/components/dashboard/IncomeExpenseChart";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -19,7 +22,7 @@ export default function Dashboard() {
       >
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          Welcome back, John. Here's your financial overview.
+          Welcome back, {user?.business_name ?? user?.email ?? "there"}. Here's your financial overview.
         </p>
       </motion.div>
 

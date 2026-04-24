@@ -19,7 +19,7 @@ async def get_spending_insights(
     try:
         service = AIInsightsService(settings.OPENAI_API_KEY)
         insights = await service.generate_expense_insights(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             expenses_data=[],
         )
         return insights
@@ -36,7 +36,7 @@ async def get_tax_optimization(
     try:
         service = AIInsightsService(settings.OPENAI_API_KEY)
         tips = await service.generate_tax_optimization_tips(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             user_role="",
             financial_data={},
         )
@@ -54,7 +54,7 @@ async def analyze_cash_flow(
     try:
         service = AIInsightsService(settings.OPENAI_API_KEY)
         analysis = await service.analyze_cash_flow(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             transactions=[],
             invoices=[],
         )

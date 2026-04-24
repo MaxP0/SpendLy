@@ -2,9 +2,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Quotes from "./pages/Quotes";
 import Invoices from "./pages/Invoices";
 import Expenses from "./pages/Expenses";
@@ -18,28 +23,38 @@ const PageWithLayout = ({ children }: { children: React.ReactNode }) => (
   <AppLayout>{children}</AppLayout>
 );
 
+const ProtectedPage = ({ children }: { children: React.ReactNode }) => (
+  <ProtectedRoute>
+    <PageWithLayout>{children}</PageWithLayout>
+  </ProtectedRoute>
+);
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<PageWithLayout><Dashboard /></PageWithLayout>} />
-          <Route path="/quotes" element={<PageWithLayout><Quotes /></PageWithLayout>} />
-          <Route path="/invoices" element={<PageWithLayout><Invoices /></PageWithLayout>} />
-          <Route path="/transactions" element={<PageWithLayout><NotFound /></PageWithLayout>} />
-          <Route path="/expenses" element={<PageWithLayout><Expenses /></PageWithLayout>} />
-          <Route path="/income" element={<PageWithLayout><NotFound /></PageWithLayout>} />
-          <Route path="/tax" element={<PageWithLayout><Tax /></PageWithLayout>} />
-          <Route path="/reports" element={<PageWithLayout><NotFound /></PageWithLayout>} />
-          <Route path="/settings" element={<PageWithLayout><NotFound /></PageWithLayout>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <BrowserRouter>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={<ProtectedPage><Dashboard /></ProtectedPage>} />
+            <Route path="/quotes" element={<ProtectedPage><Quotes /></ProtectedPage>} />
+            <Route path="/invoices" element={<ProtectedPage><Invoices /></ProtectedPage>} />
+            <Route path="/transactions" element={<ProtectedPage><NotFound /></ProtectedPage>} />
+            <Route path="/expenses" element={<ProtectedPage><Expenses /></ProtectedPage>} />
+            <Route path="/income" element={<ProtectedPage><NotFound /></ProtectedPage>} />
+            <Route path="/tax" element={<ProtectedPage><Tax /></ProtectedPage>} />
+            <Route path="/reports" element={<ProtectedPage><NotFound /></ProtectedPage>} />
+            <Route path="/settings" element={<ProtectedPage><NotFound /></ProtectedPage>} />
+            <Route path="*" element={<ProtectedPage><NotFound /></ProtectedPage>} />
+          </Routes>
+          {import.meta.env.DEV ? <ReactQueryDevtools initialIsOpen={false} /> : null}
+        </TooltipProvider>
+      </QueryClientProvider>
+    </AuthProvider>
+  </BrowserRouter>
 );
 
 export default App;

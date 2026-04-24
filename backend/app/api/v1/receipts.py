@@ -18,7 +18,7 @@ async def create_receipt(
     try:
         service = ReceiptService(db)
         receipt = await service.create_receipt(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             file_path="placeholder_path",
             inquiry_id=request.inquiry_id,
             merchant=request.merchant,
@@ -52,7 +52,7 @@ async def list_receipts(
 ):
     """List all receipts for the current user."""
     service = ReceiptService(db)
-    receipts = await service.list_user_receipts(current_user["user_id"])
+    receipts = await service.list_user_receipts(current_user.id)
     return receipts
 
 
@@ -66,7 +66,7 @@ async def get_receipt(
     try:
         service = ReceiptService(db)
         receipt = await service.get_receipt(receipt_id)
-        if receipt.user_id != current_user["user_id"]:
+        if receipt.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return receipt
     except ValueError as e:
@@ -84,7 +84,7 @@ async def update_receipt(
     try:
         service = ReceiptService(db)
         receipt = await service.get_receipt(receipt_id)
-        if receipt.user_id != current_user["user_id"]:
+        if receipt.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
         receipt = await service.update_receipt(

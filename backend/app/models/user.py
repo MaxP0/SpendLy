@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, DateTime, Enum as SQLEnum, Text, Index
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, Index, String, Text
+from sqlalchemy.orm import relationship
 import uuid
 import enum
 from app.models.base import Base, TimestampMixin
@@ -24,3 +25,15 @@ class User(TimestampMixin, Base):
     business_name = Column(String(255), nullable=True)
     business_address = Column(Text, nullable=True)
     gdpr_consent_at = Column(DateTime, nullable=True)
+
+    customers = relationship("Customer", back_populates="user", cascade="all, delete-orphan")
+    inquiries = relationship("Inquiry", back_populates="user", cascade="all, delete-orphan")
+    invoices = relationship("Invoice", back_populates="user", cascade="all, delete-orphan")
+    receipts = relationship("Receipt", back_populates="user", cascade="all, delete-orphan")
+    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+    payments = relationship("Payment", back_populates="user", cascade="all, delete-orphan")
+    bank_transactions = relationship("BankTransaction", back_populates="user", cascade="all, delete-orphan")
+    tax_summaries = relationship("TaxSummary", back_populates="user", cascade="all, delete-orphan")
+    audit_logs = relationship("AuditLog", back_populates="user", cascade="all, delete-orphan")
+    refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
+

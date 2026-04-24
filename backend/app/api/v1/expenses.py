@@ -19,7 +19,7 @@ async def create_expense(
         service = ExpenseService(db)
         expense = await service.create_expense(
             receipt_id=request.receipt_id,
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             amount=request.amount,
             inquiry_id=request.inquiry_id,
             vat_amount=request.vat_amount,
@@ -37,7 +37,7 @@ async def list_expenses(
 ):
     """List all expenses for the current user."""
     service = ExpenseService(db)
-    expenses = await service.list_user_expenses(current_user["user_id"])
+    expenses = await service.list_user_expenses(current_user.id)
     return expenses
 
 
@@ -51,7 +51,7 @@ async def get_expense(
     try:
         service = ExpenseService(db)
         expense = await service.get_expense(expense_id)
-        if expense.user_id != current_user["user_id"]:
+        if expense.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return expense
     except ValueError as e:
@@ -69,7 +69,7 @@ async def update_expense(
     try:
         service = ExpenseService(db)
         expense = await service.get_expense(expense_id)
-        if expense.user_id != current_user["user_id"]:
+        if expense.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
         expense = await service.update_expense(

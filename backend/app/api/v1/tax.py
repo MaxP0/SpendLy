@@ -33,7 +33,7 @@ async def calculate_taxes(
         from app.services.user_service import UserService
         
         user_service = UserService(db)
-        user = await user_service.get_user(current_user["user_id"])
+        user = await user_service.get_user(current_user.id)
         
         result = TaxEngine.calculate_taxes(user.role, financial_data)
         return result

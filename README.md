@@ -53,3 +53,21 @@ Required variables:
 ## Development Notes
 - The canonical local database is PostgreSQL only.
 - Database schema changes should be handled through Alembic migrations in `database/migrations/`.
+
+## Seed demo data
+Populate the database with one demo user and ~6 months of realistic data (3 customers, 8 inquiries, 12 invoices, 20 expenses, 40 bank transactions):
+
+```bash
+docker compose exec backend python -m app.scripts.seed_demo
+```
+
+Demo login:
+- Email: `demo@spendly.test`
+- Password: `Demo1234!`
+
+The seed script is idempotent — re-running it will not duplicate data.
+
+## Running tests
+```bash
+docker compose exec backend pytest
+```

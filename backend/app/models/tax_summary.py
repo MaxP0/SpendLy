@@ -1,4 +1,6 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Float, Enum as SQLEnum, Index
+from sqlalchemy import Column, DateTime, Enum as SQLEnum, Float, ForeignKey, Index, JSON, String
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 import uuid
 import enum
 from app.models.base import Base, TimestampMixin
@@ -45,3 +47,7 @@ class TaxSummary(TimestampMixin, Base):
     
     status = Column(SQLEnum(TaxSummaryStatus), default=TaxSummaryStatus.DRAFT, nullable=False)
     generated_at = Column(DateTime, nullable=True)
+
+    payload = Column(JSONB().with_variant(JSON(), "sqlite"), nullable=True)
+
+    user = relationship("User", back_populates="tax_summaries")

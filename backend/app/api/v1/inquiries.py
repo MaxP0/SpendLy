@@ -18,7 +18,7 @@ async def create_inquiry(
     try:
         service = InquiryService(db)
         inquiry = await service.create_inquiry(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             customer_id=request.customer_id,
             title=request.title,
             description=request.description,
@@ -35,7 +35,7 @@ async def list_inquiries(
 ):
     """List all inquiries for the current user."""
     service = InquiryService(db)
-    inquiries = await service.list_user_inquiries(current_user["user_id"])
+    inquiries = await service.list_user_inquiries(current_user.id)
     return inquiries
 
 
@@ -49,7 +49,7 @@ async def get_inquiry(
     try:
         service = InquiryService(db)
         inquiry = await service.get_inquiry(inquiry_id)
-        if inquiry.user_id != current_user["user_id"]:
+        if inquiry.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return inquiry
     except ValueError as e:
@@ -67,7 +67,7 @@ async def update_inquiry(
     try:
         service = InquiryService(db)
         inquiry = await service.get_inquiry(inquiry_id)
-        if inquiry.user_id != current_user["user_id"]:
+        if inquiry.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
         inquiry = await service.update_inquiry(

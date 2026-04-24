@@ -15,10 +15,13 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     JWT_SECRET: str
     JWT_ALGORITHM: str = "HS256"
+    JWT_ISSUER: str = "spendly-api"
+    JWT_AUDIENCE: str = "spendly-client"
     OPENAI_API_KEY: str
     TESSERACT_CMD: str = ""
     CORS_ORIGINS: str = "http://localhost:5173"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ENVIRONMENT: str = "development"
 
     @property

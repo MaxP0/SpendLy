@@ -22,7 +22,7 @@ async def import_transaction(
     try:
         service = TransactionService(db)
         transaction = await service.import_transaction(
-            user_id=current_user["user_id"],
+            user_id=current_user.id,
             date=request.date,
             amount=request.amount,
             description=request.description,
@@ -39,7 +39,7 @@ async def list_transactions(
 ):
     """List all transactions for the current user."""
     service = TransactionService(db)
-    transactions = await service.list_user_transactions(current_user["user_id"])
+    transactions = await service.list_user_transactions(current_user.id)
     return transactions
 
 
@@ -53,7 +53,7 @@ async def get_transaction(
     try:
         service = TransactionService(db)
         transaction = await service.get_transaction(transaction_id)
-        if transaction.user_id != current_user["user_id"]:
+        if transaction.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         return transaction
     except ValueError as e:
@@ -71,7 +71,7 @@ async def update_transaction(
     try:
         service = TransactionService(db)
         transaction = await service.get_transaction(transaction_id)
-        if transaction.user_id != current_user["user_id"]:
+        if transaction.user_id != current_user.id:
             raise HTTPException(status_code=403, detail="Not authorized")
         
         if request.reconciliation_status:
