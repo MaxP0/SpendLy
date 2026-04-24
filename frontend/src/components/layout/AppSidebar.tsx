@@ -22,7 +22,7 @@ const navigationItems = [
   { title: "Invoices", url: "/invoices", icon: Receipt },
   { title: "Payments", url: "/payments", icon: CreditCard },
   { title: "Expenses", url: "/expenses", icon: Wallet },
-  { title: "Transactions", url: "/transactions", icon: Building2 },
+  { title: "Income", url: "/income", icon: Building2 },
   { title: "Tax & Revenue", url: "/tax", icon: PieChart },
   { title: "Reports", url: "/reports", icon: FileBarChart },
 ];

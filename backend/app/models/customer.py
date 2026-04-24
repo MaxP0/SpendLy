@@ -1,20 +1,16 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
-from sqlalchemy.orm import declarative_base
-from datetime import datetime
+from sqlalchemy import Column, String, ForeignKey, Index
 import uuid
+from app.models.base import Base, TimestampMixin
 
-Base = declarative_base()
 
-
-class Customer(Base):
+class Customer(TimestampMixin, Base):
     """Customer model."""
     __tablename__ = "customers"
-    
+    __table_args__ = (Index("ix_customers_user_id", "user_id"),)
+
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
-    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
+
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=True)
     phone = Column(String(20), nullable=True)

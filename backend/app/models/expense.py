@@ -1,22 +1,22 @@
-from sqlalchemy import Column, String, DateTime, ForeignKey, Float, Boolean, Text
-from sqlalchemy.orm import declarative_base
-from datetime import datetime
+from sqlalchemy import Column, String, ForeignKey, Float, Boolean, Index
 import uuid
+from app.models.base import Base, TimestampMixin
 
-Base = declarative_base()
 
-
-class Expense(Base):
+class Expense(TimestampMixin, Base):
     """Expense model."""
     __tablename__ = "expenses"
-    
+    __table_args__ = (
+        Index("ix_expenses_receipt_id", "receipt_id"),
+        Index("ix_expenses_user_id", "user_id"),
+        Index("ix_expenses_inquiry_id", "inquiry_id"),
+    )
+
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
-    receipt_id = Column(String(36), ForeignKey("receipts.id"), nullable=False, index=True)
-    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, index=True)
-    inquiry_id = Column(String(36), ForeignKey("inquiries.id"), nullable=True, index=True)
+
+    receipt_id = Column(String(36), ForeignKey("receipts.id"), nullable=False)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
+    inquiry_id = Column(String(36), ForeignKey("inquiries.id"), nullable=True)
     
     amount = Column(Float, nullable=False)
     vat_amount = Column(Float, nullable=True)

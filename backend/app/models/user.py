@@ -1,10 +1,7 @@
-from sqlalchemy import Column, String, DateTime, Enum as SQLEnum, Text
-from sqlalchemy.orm import declarative_base
-from datetime import datetime
+from sqlalchemy import Column, String, DateTime, Enum as SQLEnum, Text, Index
 import uuid
 import enum
-
-Base = declarative_base()
+from app.models.base import Base, TimestampMixin
 
 
 class UserRole(str, enum.Enum):
@@ -14,15 +11,14 @@ class UserRole(str, enum.Enum):
     PAYE_SIDE_INCOME = "paye_side_income"
 
 
-class User(Base):
+class User(TimestampMixin, Base):
     """User model."""
     __tablename__ = "users"
-    
+    __table_args__ = (Index("ix_users_email", "email"),)
+
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-    
-    email = Column(String(255), unique=True, nullable=False, index=True)
+
+    email = Column(String(255), unique=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     role = Column(SQLEnum(UserRole), nullable=False)
     business_name = Column(String(255), nullable=True)

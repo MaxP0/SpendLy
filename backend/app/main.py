@@ -1,18 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.core.database import DatabaseManager
+from app.core.database import engine
+from app.core.config import get_settings
 from app.api.v1 import auth, inquiries, receipts, expenses, invoices, payments, transactions, tax, insights
+
+settings = get_settings()
 
 # Lifespan event handler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle startup and shutdown events."""
-    # Startup
-    DatabaseManager.initialize()
     yield
-    # Shutdown
-    await DatabaseManager.close()
+    await engine.dispose()
 
 
 # Create FastAPI app
@@ -26,7 +26,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

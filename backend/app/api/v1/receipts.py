@@ -39,8 +39,10 @@ async def upload_receipt(
     db: AsyncSession = Depends(get_db),
 ):
     """Upload a receipt file."""
-    # Placeholder: in production, save file and extract OCR
-    return {"message": "not implemented yet"}
+    raise HTTPException(
+        status_code=501,
+        detail="Receipt upload/OCR pipeline is not implemented yet and will be added in a later prompt.",
+    )
 
 
 @router.get("")

@@ -7,7 +7,7 @@
 @layer base {
   :root {
     /* Core brand colors - Deep navy/slate palette */
-    --background: 222 47% 98%;
+    --background: 200 15% 92%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;

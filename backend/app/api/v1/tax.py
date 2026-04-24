@@ -16,7 +16,10 @@ async def get_tax_summary(
     db: AsyncSession = Depends(get_db),
 ):
     """Get tax summary for a period."""
-    return {"message": "not implemented yet"}
+    raise HTTPException(
+        status_code=501,
+        detail="Tax summary endpoint is not implemented yet.",
+    )
 
 
 @router.post("/calculate")
@@ -46,7 +49,10 @@ async def get_vat_return(
     db: AsyncSession = Depends(get_db),
 ):
     """Get VAT return (VAT3/RTD) for a period."""
-    return {"message": "not implemented yet"}
+    raise HTTPException(
+        status_code=501,
+        detail="VAT return generation is not implemented yet.",
+    )
 
 
 @router.get("/annual-summary")
@@ -56,4 +62,7 @@ async def get_annual_summary(
     db: AsyncSession = Depends(get_db),
 ):
     """Get annual income summary."""
-    return {"message": "not implemented yet"}
+    raise HTTPException(
+        status_code=501,
+        detail="Annual tax summary is not implemented yet.",
+    )

@@ -1,52 +1,55 @@
-## Tech Stack
-- Frontend: React + TypeScript + Vite + TailwindCSS
-- Backend: FastAPI (Python)
-- DB: SQLite (for demo)
-- OCR: Tesseract via `pytesseract` (fallback to mock)
+# Spendly
 
-## Setup
+Spendly is a FastAPI + React financial/tax management app for Irish self-employed users and PAYE employees with side income.
 
-### Backend
-1. Create a virtual environment and install deps:
+## Stack
+- Backend: FastAPI + SQLAlchemy 2.x async
+- Database: PostgreSQL 16
+- Migrations: Alembic
+- Frontend: React + Vite
+- Local orchestration: Docker Compose
 
-```zsh
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+## Quick Start
+1. Start services:
+
+```bash
+docker compose up --build
 ```
 
-2. Run the API:
+2. Verify backend health:
 
-```zsh
-uvicorn app.main:app --reload --port 8000
+```bash
+curl http://localhost:8000/api/v1/health
 ```
 
-### Frontend
+Expected response:
 
-1. Install deps and run dev server:
-
-```zsh
-cd frontend
-npm install
-npm run dev
+```json
+{"status":"ok"}
 ```
 
-Frontend will run on `http://localhost:5173` and backend on `http://localhost:8000`.
+3. Open the app and API docs:
+- Frontend: http://localhost:5173
+- Swagger UI: http://localhost:8000/docs
 
-## Demo Flow
-1. Use a seeded demo user or register a new one.
-	 - Seeded users:
-		 - demo@spendly.test / demo123
-		 - alice@spendly.test / alice123
-		 - bob@spendly.test / bob123
-2. Login; you will be redirected to `/dashboard`.
-3. Use the sidebar to show system modules.
-4. Go to `Receipts & Expenses`, upload an image or PDF.
-5. See raw OCR text, extracted amount/date, and status message. If OCR fails or Tesseract is missing, mock values are returned. Uploading a `.txt` file will display its contents as raw text for quick verification.
+## Services
+- `db`: PostgreSQL 16
+- `backend`: FastAPI API server (runs Alembic upgrade on startup)
+- `frontend`: Vite dev server
 
-## Notes
-- This is a demo; security is minimal (JWT token, bcrypt hashing).
-- Database is SQLite; stored in `backend/app.db`.
-- Uploads are saved to `backend/uploads/`.
-- Tailwind neutral styling with simple layout.
+## Environment
+Backend environment template is in `backend/.env.example`.
+
+Required variables:
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `JWT_ALGORITHM`
+- `ACCESS_TOKEN_EXPIRE_MINUTES`
+- `CORS_ORIGINS`
+- `OPENAI_API_KEY`
+- `TESSERACT_CMD`
+- `ENVIRONMENT`
+
+## Development Notes
+- The canonical local database is PostgreSQL only.
+- Database schema changes should be handled through Alembic migrations in `database/migrations/`.
