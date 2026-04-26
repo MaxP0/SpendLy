@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
+  Users,
   FileText,
   Receipt,
   CreditCard,
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Customers", url: "/customers", icon: Users },
   { title: "Quotes", url: "/quotes", icon: FileText },
   { title: "Invoices", url: "/invoices", icon: Receipt },
   { title: "Payments", url: "/payments", icon: CreditCard },

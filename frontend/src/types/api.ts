@@ -36,3 +36,27 @@ export interface RefreshResponse {
   access_token: string;
   token_type: "bearer";
 }
+
+export interface Customer {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomerListResponse {
+  items: Customer[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface CustomerPayload {
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+}
