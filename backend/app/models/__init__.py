@@ -3,6 +3,7 @@ from app.models.base import Base, TimestampMixin
 from app.models.customer import Customer
 from app.models.expense import Expense
 from app.models.inquiry import Inquiry, InquiryStatus
+from app.models.inquiry_line_item import InquiryLineItem
 from app.models.invoice import Invoice, InvoiceStatus
 from app.models.invoice_line_item import InvoiceLineItem
 from app.models.payment import Payment
@@ -20,6 +21,7 @@ __all__ = [
     "Customer",
     "Expense",
     "Inquiry",
+    "InquiryLineItem",
     "InquiryStatus",
     "Invoice",
     "InvoiceLineItem",

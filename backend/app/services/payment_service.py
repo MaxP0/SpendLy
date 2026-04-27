@@ -1,8 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select
+
 from app.repositories.payment_repo import PaymentRepository
 from app.models.payment import Payment
 import uuid
 from datetime import datetime
+
+from app.models.invoice import Invoice, InvoiceStatus
+from app.services.inquiry_service import InquiryService
 
 
 class PaymentService:
@@ -32,7 +37,17 @@ class PaymentService:
             payment_date=payment_date,
             transaction_id=transaction_id,
         )
-        return await self.repository.create(payment)
+        created = await self.repository.create(payment)
+        invoice = await self.db.scalar(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user_id))
+        if invoice is not None:
+            paid_total = await self.db.scalar(
+                select(func.coalesce(func.sum(Payment.amount), 0.0)).where(Payment.invoice_id == invoice_id)
+            )
+            if float(paid_total or 0.0) + 0.0001 >= float(invoice.total):
+                invoice.status = InvoiceStatus.PAID
+                await InquiryService(self.db).mark_completed_from_invoice(invoice_id=invoice_id)
+                await self.db.commit()
+        return created
     
     async def get_payment(self, payment_id: str) -> Payment:
         """Get payment by ID."""

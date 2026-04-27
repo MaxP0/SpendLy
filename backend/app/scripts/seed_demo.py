@@ -2,7 +2,7 @@
 
 Creates one demo user (self_employed_vat) with ~6 months of realistic data:
   - 3 customers (Irish-flavoured names)
-  - 8 inquiries (various statuses)
+    - 9 inquiries (all inquiry statuses represented)
   - 12 invoices (7 paid / 3 overdue / 2 draft) with line items
   - 20 expenses with receipts
   - 40 bank transactions (mix of reconciled + unmatched)
@@ -29,6 +29,7 @@ from app.models import (
     Customer,
     Expense,
     Inquiry,
+    InquiryLineItem,
     InquiryStatus,
     Invoice,
     InvoiceLineItem,
@@ -81,6 +82,7 @@ INQUIRY_TITLES = [
     "Plumbing fit-out consultation",
     "Brand refresh workshop",
     "VAT return review",
+    "Office refit quotation",
 ]
 
 EXPENSE_CATEGORIES = [
@@ -161,29 +163,107 @@ async def _seed_inquiries(
         )).scalars().all())
 
     statuses = [
-        InquiryStatus.COMPLETED,
-        InquiryStatus.COMPLETED,
-        InquiryStatus.COMPLETED,
-        InquiryStatus.ACTIVE,
-        InquiryStatus.ACTIVE,
-        InquiryStatus.ACTIVE,
         InquiryStatus.DRAFT,
-        InquiryStatus.DRAFT,
+        InquiryStatus.SENT,
+        InquiryStatus.ACCEPTED,
+        InquiryStatus.REJECTED,
+        InquiryStatus.DISCUSSION_REQUESTED,
+        InquiryStatus.EXPIRED,
+        InquiryStatus.INVOICED,
+        InquiryStatus.COMPLETED,
+        InquiryStatus.ARCHIVED,
     ]
     inquiries: List[Inquiry] = []
     for idx, title in enumerate(INQUIRY_TITLES):
+        created_at = _months_ago(6 - (idx % 6))
+        quantity = 10 + idx * 2
+        unit_price = 45.0 + idx * 7
+        vat_rate = 23.0 if idx % 2 == 0 else 13.5
+        net = round(quantity * unit_price, 2)
+        vat = round(net * (vat_rate / 100), 2)
+        snapshot = [
+            {
+                "id": str(uuid.uuid4()),
+                "description": "Consulting labour",
+                "quantity": float(quantity),
+                "unit_price": unit_price,
+                "vat_rate": vat_rate,
+                "line_total_net": net,
+                "line_total_vat": vat,
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "description": "Materials and travel",
+                "quantity": 1.0,
+                "unit_price": 350.0 + idx * 50,
+                "vat_rate": 23.0,
+                "line_total_net": round(350.0 + idx * 50, 2),
+                "line_total_vat": round((350.0 + idx * 50) * 0.23, 2),
+            },
+        ]
+        quote_amount = round(sum(item["line_total_net"] + item["line_total_vat"] for item in snapshot), 2)
+        sent_at = created_at + timedelta(days=7)
+        valid_until = (sent_at + timedelta(days=30)).date()
+        status = statuses[idx]
         inquiry = Inquiry(
             id=str(uuid.uuid4()),
             user_id=user.id,
             customer_id=customers[idx % len(customers)].id,
             title=title,
             description=f"Engagement: {title}.",
-            status=statuses[idx],
-            created_at=_months_ago(6 - (idx % 6)),
+            start_date=created_at.date(),
+            status=status,
+            public_token=None if status == InquiryStatus.DRAFT else str(uuid.uuid4()),
+            quote_amount=None if status == InquiryStatus.DRAFT else quote_amount,
+            quote_line_items=None if status == InquiryStatus.DRAFT else snapshot,
+            sent_at=None if status == InquiryStatus.DRAFT else sent_at,
+            valid_until=(sent_at - timedelta(days=2)).date() if status == InquiryStatus.EXPIRED else (None if status == InquiryStatus.DRAFT else valid_until),
+            accepted_at=sent_at + timedelta(days=2) if status in {InquiryStatus.ACCEPTED, InquiryStatus.INVOICED, InquiryStatus.COMPLETED} else None,
+            rejected_at=sent_at + timedelta(days=3) if status == InquiryStatus.REJECTED else None,
+            discussion_requested_at=sent_at + timedelta(days=4) if status == InquiryStatus.DISCUSSION_REQUESTED else None,
+            client_notes=[
+                {
+                    "at": (sent_at + timedelta(days=4)).isoformat(),
+                    "note": "Could you revise the labour rate?",
+                    "source": "client",
+                }
+            ] if status == InquiryStatus.DISCUSSION_REQUESTED else [],
+            archived_from_status=InquiryStatus.SENT.value if status == InquiryStatus.ARCHIVED else None,
+            created_at=created_at,
         )
         session.add(inquiry)
         inquiries.append(inquiry)
     await session.flush()
+
+    for idx, inquiry in enumerate(inquiries):
+        quantity = 10 + idx * 2
+        unit_price = 45.0 + idx * 7
+        vat_rate = 23.0 if idx % 2 == 0 else 13.5
+        net = round(quantity * unit_price, 2)
+        vat = round(net * (vat_rate / 100), 2)
+        line_items = [
+            InquiryLineItem(
+                id=str(uuid.uuid4()),
+                inquiry_id=inquiry.id,
+                description="Consulting labour",
+                quantity=float(quantity),
+                unit_price=unit_price,
+                vat_rate=vat_rate,
+                line_total_net=net,
+                line_total_vat=vat,
+            ),
+            InquiryLineItem(
+                id=str(uuid.uuid4()),
+                inquiry_id=inquiry.id,
+                description="Materials and travel",
+                quantity=1.0,
+                unit_price=round(350.0 + idx * 50, 2),
+                vat_rate=23.0,
+                line_total_net=round(350.0 + idx * 50, 2),
+                line_total_vat=round((350.0 + idx * 50) * 0.23, 2),
+            ),
+        ]
+        session.add_all(line_items)
     return inquiries
 
 

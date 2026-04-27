@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Customers", url: "/customers", icon: Users },
-  { title: "Quotes", url: "/quotes", icon: FileText },
+  { title: "Inquiries", url: "/inquiries", icon: FileText },
   { title: "Invoices", url: "/invoices", icon: Receipt },
   { title: "Payments", url: "/payments", icon: CreditCard },
   { title: "Expenses", url: "/expenses", icon: Wallet },

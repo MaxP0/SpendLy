@@ -1,7 +1,13 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func, select
+
 from app.repositories.invoice_repo import InvoiceRepository
 from app.models.invoice import Invoice
 import uuid
+from datetime import datetime
+
+from app.models.invoice import InvoiceStatus
+from app.services.inquiry_service import InquiryService
 
 
 class InvoiceService:
@@ -21,8 +27,17 @@ class InvoiceService:
         due_at = None,
     ) -> Invoice:
         """Create a new invoice."""
-        # Generate unique invoice number
-        invoice_number = f"INV-{user_id[:8]}-{str(uuid.uuid4())[:8]}".upper()
+        year = datetime.utcnow().year
+        next_sequence = int(
+            await self.db.scalar(
+                select(func.coalesce(func.max(Invoice.sequence_number), 0) + 1).where(
+                    Invoice.user_id == user_id,
+                    Invoice.sequence_year == year,
+                )
+            )
+            or 1
+        )
+        invoice_number = f"INV-{year}-{next_sequence:04d}"
         
         vat_amount = subtotal * (vat_rate / 100)
         total = subtotal + vat_amount
@@ -33,13 +48,22 @@ class InvoiceService:
             customer_id=customer_id,
             inquiry_id=inquiry_id,
             invoice_number=invoice_number,
+            sequence_year=year,
+            sequence_number=next_sequence,
+            issued_at=datetime.utcnow(),
             subtotal=subtotal,
             vat_rate=vat_rate,
             vat_amount=vat_amount,
             total=total,
             due_at=due_at,
+            status=InvoiceStatus.ISSUED,
         )
-        return await self.repository.create(invoice)
+        created = await self.repository.create(invoice)
+        if inquiry_id:
+            service = InquiryService(self.db)
+            await service.mark_invoiced(inquiry_id=inquiry_id)
+            await self.db.commit()
+        return created
     
     async def get_invoice(self, invoice_id: str) -> Invoice:
         """Get invoice by ID."""

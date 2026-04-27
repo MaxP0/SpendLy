@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     TESSERACT_CMD: str = ""
     CORS_ORIGINS: str = "http://localhost:5173"
+    FRONTEND_BASE_URL: str = "http://localhost:5173"
+    UPLOADS_DIR: str = "uploads"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ENVIRONMENT: str = "development"

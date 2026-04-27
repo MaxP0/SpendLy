@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.database import engine
 from app.core.config import get_settings
-from app.api.v1 import auth, customers, inquiries, receipts, expenses, invoices, payments, transactions, tax, insights
+from app.api.v1 import auth, customers, inquiries, public_inquiries, receipts, expenses, invoices, payments, transactions, tax, insights
 
 settings = get_settings()
 
@@ -42,6 +42,7 @@ async def health_check():
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(customers.router, prefix="/api/v1")
 app.include_router(inquiries.router, prefix="/api/v1")
+app.include_router(public_inquiries.router, prefix="/api/v1")
 app.include_router(receipts.router, prefix="/api/v1")
 app.include_router(expenses.router, prefix="/api/v1")
 app.include_router(invoices.router, prefix="/api/v1")
