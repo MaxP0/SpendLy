@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
+from decimal import Decimal
 
 from app.repositories.payment_repo import PaymentRepository
 from app.models.payment import Payment
@@ -39,11 +40,11 @@ class PaymentService:
         )
         created = await self.repository.create(payment)
         invoice = await self.db.scalar(select(Invoice).where(Invoice.id == invoice_id, Invoice.user_id == user_id))
-        if invoice is not None:
+        if invoice is not None and invoice.status == InvoiceStatus.ISSUED:
             paid_total = await self.db.scalar(
                 select(func.coalesce(func.sum(Payment.amount), 0.0)).where(Payment.invoice_id == invoice_id)
             )
-            if float(paid_total or 0.0) + 0.0001 >= float(invoice.total):
+            if Decimal(str(paid_total or 0.0)) >= Decimal(str(invoice.total)):
                 invoice.status = InvoiceStatus.PAID
                 await InquiryService(self.db).mark_completed_from_invoice(invoice_id=invoice_id)
                 await self.db.commit()

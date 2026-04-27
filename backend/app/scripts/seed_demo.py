@@ -276,10 +276,10 @@ async def _seed_invoices(
             select(Invoice).where(Invoice.user_id == user.id)
         )).scalars().all())
 
-    # Status layout: 7 paid, 3 overdue, 2 draft
+    # Status layout: 7 paid, 3 issued, 2 draft
     statuses = (
         [InvoiceStatus.PAID] * 7
-        + [InvoiceStatus.OVERDUE] * 3
+        + [InvoiceStatus.ISSUED] * 3
         + [InvoiceStatus.DRAFT] * 2
     )
 
@@ -309,24 +309,30 @@ async def _seed_invoices(
             )
 
         subtotal = round(sum(li["line_total_net"] for li in line_items_spec), 2)
-        vat_amount = round(sum(li["line_total_vat"] for li in line_items_spec), 2)
-        total = round(subtotal + vat_amount, 2)
+        vat_total = round(sum(li["line_total_vat"] for li in line_items_spec), 2)
+        total = round(subtotal + vat_total, 2)
+        customer = customers[idx % len(customers)]
 
         invoice = Invoice(
             id=str(uuid.uuid4()),
             user_id=user.id,
-            customer_id=customers[idx % len(customers)].id,
+            customer_id=customer.id,
             inquiry_id=inquiries[idx % len(inquiries)].id,
-            invoice_number=f"INV-{year}-{idx:04d}",
-            sequence_year=year,
-            sequence_number=idx,
+            invoice_number=f"INV-{year}-{idx:04d}" if status != InvoiceStatus.DRAFT else None,
+            sequence_year=year if status != InvoiceStatus.DRAFT else None,
+            sequence_number=idx if status != InvoiceStatus.DRAFT else None,
             status=status,
             subtotal=subtotal,
-            vat_rate=vat_rate,
-            vat_amount=vat_amount,
+            vat_total=vat_total,
             total=total,
             issued_at=issued_at if status != InvoiceStatus.DRAFT else None,
-            due_at=due_at if status != InvoiceStatus.DRAFT else None,
+            due_at=due_at.date() if status != InvoiceStatus.DRAFT else None,
+            currency="EUR",
+            reference=f"PO-2025-{idx:03d}",
+            customer_name_snapshot=customer.name,
+            customer_email_snapshot=customer.email,
+            customer_phone_snapshot=customer.phone,
+            customer_address_snapshot=customer.address,
             created_at=issued_at,
         )
         session.add(invoice)

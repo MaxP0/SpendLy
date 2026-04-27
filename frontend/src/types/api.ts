@@ -164,6 +164,76 @@ export interface InquiryFilters {
   offset?: number;
 }
 
+export type InvoiceStatus = "draft" | "issued" | "paid" | "cancelled";
+
+export interface InvoiceLineItemPayload {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  vat_rate: number;
+}
+
+export interface InvoiceLineItem extends InvoiceLineItemPayload {
+  id?: string | null;
+  line_total_net: number;
+  line_total_vat: number;
+}
+
+export interface InvoiceVatBreakdown {
+  rate: number;
+  net: number;
+  vat: number;
+}
+
+export interface Invoice {
+  id: string;
+  user_id: string;
+  inquiry_id: string | null;
+  customer_id: string;
+  customer_name_snapshot: string;
+  customer_email_snapshot: string | null;
+  customer_phone_snapshot: string | null;
+  customer_address_snapshot: string | null;
+  invoice_number: string | null;
+  status: InvoiceStatus;
+  subtotal: number;
+  vat_total: number;
+  total: number;
+  vat_breakdown: InvoiceVatBreakdown[];
+  line_items: InvoiceLineItem[];
+  issued_at: string | null;
+  due_at: string | null;
+  currency: string;
+  reference: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InvoicePayload {
+  customer_id: string;
+  inquiry_id?: string | null;
+  due_at: string;
+  currency?: string;
+  reference?: string | null;
+  line_items: InvoiceLineItemPayload[];
+}
+
+export interface InvoiceFilters {
+  status?: InvoiceStatus;
+  customer_id?: string;
+  from?: string;
+  to?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface InvoiceListResponse {
+  items: Invoice[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface PublicInquiry {
   business_name: string | null;
   business_address: string | null;

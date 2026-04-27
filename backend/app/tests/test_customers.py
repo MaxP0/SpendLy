@@ -136,14 +136,15 @@ async def test_delete_customer_with_invoices_returns_409(client, test_db_session
             user_id=user_id,
             customer_id=customer_id,
             inquiry_id=None,
+            customer_name_snapshot="Has Invoice",
             invoice_number="INV-2026-0001",
             sequence_year=2026,
             sequence_number=1,
             status=InvoiceStatus.DRAFT,
             subtotal=100.0,
-            vat_rate=23.0,
-            vat_amount=23.0,
+            vat_total=23.0,
             total=123.0,
+            currency="EUR",
         )
     )
     await test_db_session.commit()

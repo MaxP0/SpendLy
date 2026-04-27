@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from sqlalchemy import select
 
-from app.models import AuditLog, Customer, Inquiry, InquiryLineItem, InquiryStatus, Invoice, Payment
+from app.models import AuditLog, Customer, Inquiry, InquiryLineItem, InquiryStatus, Invoice, InvoiceStatus, Payment
 from app.services.inquiry_service import InquiryService
 from app.services.quote_pdf_service import QuotePDFService
 
@@ -247,15 +247,16 @@ async def test_auto_transitions_to_invoiced_and_completed(test_db_session):
         user_id=user_id,
         inquiry_id=inquiry.id,
         customer_id=customer.id,
+        customer_name_snapshot=customer.name,
         invoice_number="INV-2026-0001",
         sequence_year=2026,
         sequence_number=1,
-        status="issued",
+        status=InvoiceStatus.ISSUED,
         subtotal=100,
-        vat_rate=23,
-        vat_amount=23,
+        vat_total=23,
         total=123,
         issued_at=datetime.utcnow(),
+        currency="EUR",
     )
     payment = Payment(
         id=str(uuid.uuid4()),

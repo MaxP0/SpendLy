@@ -1,14 +1,4 @@
-from sqlalchemy import (
-    Column,
-    DateTime,
-    Enum as SQLEnum,
-    Float,
-    ForeignKey,
-    Index,
-    Integer,
-    String,
-    UniqueConstraint,
-)
+from sqlalchemy import Column, Date, DateTime, Enum as SQLEnum, ForeignKey, Index, Integer, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 import uuid
 import enum
@@ -20,7 +10,6 @@ class InvoiceStatus(str, enum.Enum):
     DRAFT = "draft"
     ISSUED = "issued"
     PAID = "paid"
-    OVERDUE = "overdue"
     CANCELLED = "cancelled"
 
 
@@ -38,21 +27,26 @@ class Invoice(TimestampMixin, Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     issued_at = Column(DateTime, nullable=True)
-    due_at = Column(DateTime, nullable=True)
+    due_at = Column(Date, nullable=True)
 
     user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     inquiry_id = Column(String(36), ForeignKey("inquiries.id"), nullable=True)
     customer_id = Column(String(36), ForeignKey("customers.id"), nullable=False)
 
-    invoice_number = Column(String(50), nullable=False)
-    sequence_year = Column(Integer, nullable=False)
-    sequence_number = Column(Integer, nullable=False)
+    invoice_number = Column(String(50), nullable=True)
+    sequence_year = Column(Integer, nullable=True)
+    sequence_number = Column(Integer, nullable=True)
     status = Column(SQLEnum(InvoiceStatus), default=InvoiceStatus.DRAFT, nullable=False)
 
-    subtotal = Column(Float, nullable=False)
-    vat_rate = Column(Float, default=0.0, nullable=False)
-    vat_amount = Column(Float, default=0.0, nullable=False)
-    total = Column(Float, nullable=False)
+    subtotal = Column(Numeric(12, 2), nullable=False)
+    vat_total = Column(Numeric(12, 2), nullable=False)
+    total = Column(Numeric(12, 2), nullable=False)
+    currency = Column(String(3), nullable=False, default="EUR")
+    reference = Column(String(255), nullable=True)
+    customer_name_snapshot = Column(String(255), nullable=False)
+    customer_email_snapshot = Column(String(255), nullable=True)
+    customer_phone_snapshot = Column(String(20), nullable=True)
+    customer_address_snapshot = Column(Text, nullable=True)
 
     user = relationship("User", back_populates="invoices")
     customer = relationship("Customer", back_populates="invoices")

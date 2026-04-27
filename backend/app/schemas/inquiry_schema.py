@@ -36,7 +36,7 @@ class InquiryAuditEntry(BaseModel):
 
 class InquiryInvoiceSummary(BaseModel):
     id: str
-    invoice_number: str
+    invoice_number: Optional[str] = None
     status: str
     total: float
 

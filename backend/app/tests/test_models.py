@@ -58,14 +58,15 @@ async def test_user_invoice_relationship_navigates_both_ways(session: AsyncSessi
         id=str(uuid.uuid4()),
         user_id=user.id,
         customer_id=customer.id,
+        customer_name_snapshot=customer.name,
         invoice_number="INV-2025-0001",
         sequence_year=2025,
         sequence_number=1,
         status=InvoiceStatus.DRAFT,
         subtotal=100.0,
-        vat_rate=23.0,
-        vat_amount=23.0,
+        vat_total=23.0,
         total=123.0,
+        currency="EUR",
     )
     session.add(invoice)
     await session.commit()
@@ -86,14 +87,15 @@ async def test_invoice_number_unique_per_user(session: AsyncSession) -> None:
         id=str(uuid.uuid4()),
         user_id=user.id,
         customer_id=customer.id,
+        customer_name_snapshot=customer.name,
         invoice_number="INV-2025-0001",
         sequence_year=2025,
         sequence_number=1,
         status=InvoiceStatus.DRAFT,
         subtotal=100.0,
-        vat_rate=23.0,
-        vat_amount=23.0,
+        vat_total=23.0,
         total=123.0,
+        currency="EUR",
     )
     session.add(first)
     await session.commit()
@@ -102,14 +104,15 @@ async def test_invoice_number_unique_per_user(session: AsyncSession) -> None:
         id=str(uuid.uuid4()),
         user_id=user.id,
         customer_id=customer.id,
+        customer_name_snapshot=customer.name,
         invoice_number="INV-2025-0001",
         sequence_year=2025,
         sequence_number=2,
         status=InvoiceStatus.DRAFT,
         subtotal=50.0,
-        vat_rate=23.0,
-        vat_amount=11.5,
+        vat_total=11.5,
         total=61.5,
+        currency="EUR",
     )
     session.add(duplicate)
     with pytest.raises(IntegrityError):
